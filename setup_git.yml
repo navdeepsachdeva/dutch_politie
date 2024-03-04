@@ -1,0 +1,21 @@
+- name: Setup Git with new lab parameters
+  hosts: localhost
+  remote_user: student
+  connection: local
+  become: false
+  tasks:
+  - name:  git values
+    git_config:
+      name: "{{ item.name }}"
+      scope: global
+      value: "{{ item.value }}"
+    loop:
+    - name: user.name
+      value: 'Student User'
+    - name: user.email
+      value: student@lab.example.com
+    - name: push.default
+      value: simple
+    - name: credential.helper
+      value: store
+    delegate_to: workstation.lab.example.com

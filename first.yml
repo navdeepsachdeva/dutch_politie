@@ -1,0 +1,19 @@
+- name: This is my First Playbook
+  hosts: servera*
+  gather_facts: no
+  remote_user: devops
+  tasks:
+  - name: Create a new DIR in /tmp dir
+    file:
+      path: /tmp/mydir
+      state: directory
+
+  - name: create a file in above dir
+    copy:
+      content: "SOmething here AGAIn"
+      dest: /tmp/mydir/bla.txt
+
+  - name: Install httpd package
+    dnf:
+      name: httpd
+      state: present

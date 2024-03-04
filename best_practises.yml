@@ -1,0 +1,29 @@
+- name: This is my First Playbook
+  hosts: servera*
+  gather_facts: false
+  remote_user: devops
+  vars:
+    fol: /tmp/mydir
+  tasks:
+    - name: Create a new DIR in /tmp dir
+      ansible.builtin.file:
+        path: "{{ fol }}"
+        state: directory
+
+    - name: create a file in above dir
+      ansible.builtin.copy:
+        content: "SOmething here AGAIn"
+        dest: /tmp/mydir/bla.txt
+
+    - name: Install httpd package
+      ansible.builtin.dnf:
+        name: httpd
+        state: present
+
+    # - name: Start httpd service GOOD Practise
+    #  service:
+    #    name: httpd
+    #    state: started
+
+    - name: Start httpd service BAD Practise
+      ansible.builtin.service: name=httpd  state=started

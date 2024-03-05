@@ -1,0 +1,19 @@
+---
+ansible-navigator:
+  ansible:
+    inventory:
+      entries:
+      - /home/student/politie/myinventory
+  execution-environment:
+    container-engine: podman
+    enabled: true
+    image: hub.lab.example.com/ee-supported-rhel8:latest
+    pull:
+      policy: missing
+  logging:
+    append: true
+    file: /home/student/politie/ansible-navigator.log
+    level: warning
+  mode: stdout
+  playbook-artifact:
+    enable: false

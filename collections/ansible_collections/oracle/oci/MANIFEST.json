@@ -1,0 +1,43 @@
+{
+ "collection_info": {
+  "namespace": "oracle",
+  "name": "oci",
+  "version": "4.40.0",
+  "authors": [
+   "AmeyaLokre",
+   "manojmeda",
+   "mross22",
+   "nalsaber",
+   "ruturajmolawade"
+  ],
+  "readme": "README.md",
+  "tags": [
+   "oracle",
+   "cloud",
+   "oci",
+   "oci_ansible_collection",
+   "oci_ansible",
+   "ansible",
+   "oci_ansible_modules"
+  ],
+  "description": "Oracle Cloud Infrastructure modules provides an easy way to create and provision resources.",
+  "license": [
+   "GPL-3.0-or-later",
+   "Apache-2.0"
+  ],
+  "license_file": null,
+  "dependencies": {},
+  "repository": "https://github.com/oracle/oci-ansible-collections/",
+  "documentation": "https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/ansible.htm",
+  "homepage": "https://docs.cloud.oracle.com/iaas/Content/API/SDKDocs/ansible.htm",
+  "issues": "https://github.com/oracle/oci-ansible-collections/issues"
+ },
+ "file_manifest_file": {
+  "name": "FILES.json",
+  "ftype": "file",
+  "chksum_type": "sha256",
+  "chksum_sha256": "4b61a4fcf57095fb2446b4b31469b1474974bf803551e16c6718941ab6c5a23a",
+  "format": 1
+ },
+ "format": 1
+}

@@ -1,19 +1,22 @@
 - name: This is my First Playbook
   hosts: servera*
-  gather_facts: no
+  gather_facts: false
   remote_user: devops
   tasks:
-  - name: Create a new DIR in /tmp dir
-    file:
-      path: /tmp/mydir
-      state: directory
+    # sdfsdfv
+    - name: Create a new DIR in /tmp dir
+      ansible.builtin.file:
+        path: /tmp/mydir
+        state: directory
+        mode: 0755
 
-  - name: create a file in above dir
-    copy:
-      content: "SOmething here AGAIn"
-      dest: /tmp/mydir/bla.txt
+    - name: create a file in above dir
+      ansible.builtin.copy:
+        content: "SOmething here AGAIn"
+        dest: /tmp/mydir/bla.txt
+        mode: 0644
 
-  - name: Install httpd package
-    dnf:
-      name: httpd
-      state: present
+    - name: Install httpd package
+      ansible.builtin.dnf:
+        name: httpd
+        state: present

@@ -1,0 +1,11 @@
+collections:
+  - name: community.cockroachdb
+    version: 0.2.0
+
+  - name: community.general
+
+  - name: oracle.oci
+    version: 4.40.0
+
+  - name: ansible.controller
+    

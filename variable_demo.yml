@@ -1,0 +1,44 @@
+- name: Variable Demo
+  hosts:
+    - dev
+    - utrecht
+  gather_facts: false
+  vars:
+    floor: Level12
+  # Level13 vars prompt
+  vars_prompt:
+    - name: floor
+      prompt: "Try your LUCK !!"
+      private: false
+  vars_files:
+    - vars/outside_vars.yml
+
+  tasks:
+    - name: Set a FACT
+      ansible.builtin.set_fact:
+        floor: Level19
+    - name: Import a VARS file
+      ansible.builtin.include_vars:
+        file: vars/some_vars.yml
+    - name: Print Hosts Value 1
+      ansible.builtin.debug:
+        msg: "Hello {{ floor }} on {{ inventory_hostname }}"
+    - name: Fantastic Block Display
+      block:
+        - name: Task  2
+          ansible.builtin.debug:
+            msg: "Hello {{ floor }}"
+          vars:
+            floor: Level17
+        - name: Task  3
+          ansible.builtin.debug:
+            msg: "Hello {{ floor }}"
+      vars:
+        floor: Level16
+      #when: meme is defined
+    - name: Print Hosts Value 4
+      ansible.builtin.debug:
+        msg: "Hello {{ floor }}"
+
+# ansible-navigator run variable_demo.yml -e 'floor=Level22_GOD_LEVEL'
+

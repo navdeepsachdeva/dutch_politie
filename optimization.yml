@@ -1,0 +1,47 @@
+- name: Play 1
+  hosts: servera*
+  gather_facts: false
+  tasks:
+    - name: Collect Selected Tasks
+      ansible.builtin.setup:
+        gather_subset:
+          - '!all'
+          - default_ipv4
+          - hardware
+    - name: Print Facts
+      ansible.builtin.debug:
+        msg: "{{ ansible_fqdn}} {{ ansible_nodename }} {{ ansible_bios_version }}"
+
+- name: Play 2
+  hosts: servera*
+  gather_facts: false
+  tasks:
+    - name: Print Facts
+      ansible.builtin.debug:
+        msg: "{{ ansible_default_ipv4.address }} {{ ansible_distribution }}"
+
+
+## - name: Install Multiple packages/services
+##   hosts: servera*
+##   tasks:
+##     - name: Install Many packages
+##       ansible.builtin.dnf:
+##         name:
+##           - httpd
+##           - mod_ssl
+##           - httpd-tools
+##           - mariadb-server
+##           - mariadb
+##           - php
+##           - php-mysqlnd
+##     
+##     - name: Install Many packages
+##       ansible.builtin.dnf:
+##         name: "{{ item }}"
+##           - httpd
+##           - mod_ssl
+##           - httpd-tools
+##           - mariadb-server
+##           - mariadb
+##           - php
+##           - php-mysqlnd

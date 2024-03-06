@@ -1,0 +1,15 @@
+- name: Filter Strings and IP'S
+  hosts: servera*
+  gather_facts: false
+  vars:
+    somevar: "something"
+  tasks:
+    - name: Filters my Strings
+      ansible.builtin.debug:
+        msg: >
+            long string, {{ somevar | upper }}
+            {{ nono | default("NOT DEFINED") }}
+            {{ 'experiments' | capitalize }}
+            {{ ('we will do now' | length) +10}}
+            {{ [2, 2,2,2,4, 6, 8, 10, 12] | unique | sum }}
+  

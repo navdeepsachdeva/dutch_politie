@@ -1,0 +1,28 @@
+- name: IP Filters in Playbook
+  hosts: servera*
+  gather_facts: false
+  vars:
+    myips:
+    - 172.25.250.254
+    - 88.44.22.55/8
+    - 10.10.2.20/8
+    - 10.10.4.444/8
+    - 192.168.2.15/24
+    - fe80::a1c0:e2e5:a201:8cfa/64
+    - 100.24.45.24
+
+  ## Install python-netaddr package first
+
+  tasks:
+  - name: Print Valid IP
+    debug:
+      msg: "{{ myips | ansible.utils.ipaddr | ansible.utils.ipv6}}"
+    
+    
+  - name: Print Public IP
+    debug:
+      msg: "{{ myips | ansible.utils.ipaddr | ansible.utils.ipv4('public') }}"
+
+  - name: Print Private IP
+    debug:
+      msg: "{{ myips | ansible.utils.ipaddr | ansible.utils.ipv4('private') }}"

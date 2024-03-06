@@ -1,0 +1,42 @@
+- name: Loops and Dict
+  hosts: servera*
+  gather_facts: false
+  vars_files:
+    - vars/outside_vars.yml
+  tasks:
+    - name: Print List as it is
+      ansible.builtin.debug:
+        msg: "{{ simple_list }}"
+      
+    - name: Print Simple List as loop
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ simple_list }}"
+
+    - name: Print Complex List as loop
+      ansible.builtin.debug:
+        msg: "{{ item.fn }} == {{ item.ln}}"
+      loop: "{{ complex_list }}"
+
+    - name: Print DICT as loop
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ mydict | dict2items}}"
+
+    - name: Create/Remove Users via LIST
+      ansible.builtin.user:
+        name: "{{ item.fn }}"
+        comment: "{{ item.fn |upper}} {{ item.ln | upper}}"
+        state: absent
+        password: "{{ 'redhat123' | password_hash('sha512') }}"
+      loop: "{{ complex_list }}"
+      become: true
+
+    - name: Create/Remove Users via DICT
+      ansible.builtin.user:
+        name: "{{ item.key }}"
+        comment: "{{ item.key |upper }} {{ item.value | upper }}"
+        state: present
+        password: "{{ 'redhat123' | password_hash('sha512') }}"
+      loop: "{{ mydict | dict2items}}"
+      become: true

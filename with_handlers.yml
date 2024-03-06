@@ -1,0 +1,52 @@
+- name: With Handlers
+  hosts: servera*
+  gather_facts: false
+  tasks:
+    - name: Install Web Package
+      ansible.builtin.dnf:
+        name: httpd
+        state: present
+      notify:
+        - Package Installed
+        - Start Service if something changed
+
+    - name: Deploy a Web App
+      ansible.builtin.copy:
+        content: "File Deployed Handlers"
+        dest: /var/www/html/index.html
+      notify:
+        - Application Deployed
+        - Start Service if something changed
+    - name: Install Security Package
+      ansible.builtin.dnf:
+        name: firewalld
+        state: present
+
+    - name: Open Security Port
+      ansible.posix.firewalld:
+        service: http
+        permanent: true
+        state: enabled
+        immediate: true
+        
+      
+      
+
+  handlers:
+    - name: One More Handlers
+      ansible.builtin.debug:
+        msg: "SOmething here"
+    - name: Start Web Service if something changed
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
+    - name: Start Security Service if something changed
+      ansible.builtin.service:
+        name: firewalld
+        state: restarted
+    - name: Application Deployed
+      ansible.builtin.debug:
+        msg: "App in Place"
+    - name: Package Installed
+      ansible.builtin.debug:
+        msg: "Package is Installed"

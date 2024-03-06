@@ -1,0 +1,44 @@
+---
+# handlers file for web_server
+
+- name: One More Handlers
+  ansible.builtin.debug:
+    msg: "SOmething here"
+
+- name: Start Web Service if something changed
+  ansible.builtin.service:
+    name: httpd
+    state: restarted
+
+- name: Application Deployed
+  ansible.builtin.debug:
+    msg: "App in Place"
+
+- name: Package Installed
+  ansible.builtin.debug:
+    msg: "Package is Installed"
+
+- name: Application Deployed1
+  ansible.builtin.debug:
+    msg: "App1 in Place"
+  listen: Application Deployed
+
+- name: Application Deployed2
+  ansible.builtin.debug:
+    msg: "App2 in Place"
+  listen: Application Deployed
+
+- name: Application Deployed3
+  ansible.builtin.debug:
+    msg: "App3 in Place"
+  listen: Application Deployed
+
+- name: Application Deployed4
+  ansible.builtin.debug:
+    msg: "App4 in Place"
+  listen: Application Deployed
+
+- name: Application Deployed5
+  ansible.builtin.debug:
+    msg: "App5 in Place"
+  listen: Application Deployed

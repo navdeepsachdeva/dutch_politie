@@ -1,0 +1,49 @@
+- name: Use a Role in Playbook
+  hosts: servera*
+  roles:
+    #- role: security_server
+    - role: web_server
+      web_server_content: "Override Playbook"
+
+  tasks:
+
+    - name: Just an Extra Task
+      ansible.builtin.command: sleep 4
+      notify:
+        - extra_handler
+
+  handlers:
+    - name: extra_handler
+      ansible.builtin.debug:
+        msg: "Just an extra Handler"
+
+    - name: log files removed
+      ansible.builtin.debug:
+        msg: "Unneccesary files Removed"
+
+    - name: inform Client services UP
+      ansible.builtin.debug:
+        msg: "FB UP STart Wasting TIme"
+    - name: inform Client services DOWN
+      ansible.builtin.debug:
+        msg: "FB Down Sleep NOW"
+
+  post_tasks:
+    - name: Remove Log File
+      ansible.builtin.command: rm -rf /tmp/*
+      notify:
+        - log files removed
+    - name: Post sleep
+      ansible.builtin.command: sleep 4
+      notify:
+        - inform Client services UP
+  pre_tasks:
+    - name: Check Memory First
+      ansible.builtin.assert:
+        that: ansible_memory_mb.real.free > 200
+        success_msg: "Hurray Fine"
+        fail_msg: "Not Enough Memory"
+    - name: Pre sleep
+      ansible.builtin.command: sleep 4
+      notify:
+        - inform Client services DOWN

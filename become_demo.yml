@@ -1,0 +1,44 @@
+- name: With Handlers
+  hosts: servera*
+  gather_facts: false
+  become: false
+  tasks:
+    - name: Task 1 Outside Block
+      ansible.builtin.debug:
+        msg: "SOmething here"
+
+    - name: Web Server Tasks Block
+      block:
+        - name: Install Web Package
+          ansible.builtin.dnf:
+            name: httpd
+            state: present
+
+        - name: Deploy a Web App
+          ansible.builtin.copy:
+            content: "File Deployed Handlers"
+            dest: /var/www/html/index.html
+        - name: Start Web Service if something changed
+          ansible.builtin.service:
+            name: httpd
+            state: restarted
+      become: true
+
+    - name: Security Server Tasks Block
+      block:
+        - name: Open Security Port
+          ansible.posix.firewalld:
+            service: http
+            permanent: true
+            state: enabled
+            immediate: true
+        - name: Start Security Service if something changed
+          ansible.builtin.service:
+            name: firewalld
+            state: restarted
+      become: true
+        
+    - name: Task 2 Outside Block
+      ansible.builtin.debug:
+        msg: "App in Place"
+      # become: true

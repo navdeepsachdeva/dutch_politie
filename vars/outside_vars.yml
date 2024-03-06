@@ -1,1 +1,22 @@
 floor: Level14
+
+simple_list:
+  - edwin
+  - rene
+  - erik
+  - cuno
+
+complex_list:
+  - fn: edwin
+    ln: H
+  - fn: rene
+    ln: B
+  - fn: erik
+    ln: F
+  - fn: cuno
+    ln: G
+mydict:
+  edwin: H
+  rene: B
+  erik: F
+  cuno: G

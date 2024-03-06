@@ -1,0 +1,31 @@
+- name: Without Handlers Register Variable
+  hosts: servera*
+  gather_facts: false
+  tasks:
+    - name: Install Web Package
+      ansible.builtin.dnf:
+        name: httpd
+        state: present
+      register: web_output
+
+    - name: Deploy a Web App
+      ansible.builtin.copy:
+        content: "File Deployed"
+        dest: /var/www/html/index.html
+      register: app_output
+
+
+    - name: Print Web Output
+      ansible.builtin.debug:
+        var: web_output
+
+    - name: Print App Output
+      ansible.builtin.debug:
+        var: app_output
+
+    - name: Start Service if something changed
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
+      when: web_output.changed == "true" or app_output.changed ==true
+      

@@ -5,13 +5,17 @@ workstation.lab.example.com
 floor=Level3
 
 [dev]
+serverf.lab.example.com floor=Level8 ansible_become=true
 servera.lab.example.com
 serverb.lab.example.com floor=Level8
-serverf.lab.example.com floor=Level8
+
 
 [utrecht]
-Load_balancer ansible_host=serverc.lab.example.com
+Load_balancer ansible_host=serverc.lab.example.com floor=MyLevel
 Web_Server ansible_host=serverd.lab.example.com
+
+[utrecht:vars]
+floor=SomeLevel
 
 [prod]
 servere.lab.example.com
@@ -19,8 +23,8 @@ servere.lab.example.com
 172.25.250.15
 
 # [lots]
-# system_[A:I].lab.example.com
-# 192.168.[1:4].[5:8] ansible_connection=winrm ansible_port=5876 ansible_become_user=administrator 
+# system_[A:C].lab.example.com
+# 192.168.[1:2].[5:6] ansible_connection=winrm ansible_port=5876 ansible_become_user=administrator 
 
 [big_group:children]
 dev

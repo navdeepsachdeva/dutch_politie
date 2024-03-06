@@ -1,0 +1,57 @@
+- name: With Handlers
+  hosts: servera*
+  gather_facts: false
+  become: true
+  tasks:
+
+    - name: Install Web Package
+      ansible.builtin.dnf:
+        name: httpd
+        state: present
+      tags:
+        - web
+
+    - name: Start Web Service if something changed
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
+      tags:
+        - web
+
+    - name: Open Security Port
+      ansible.posix.firewalld:
+        service: http
+        permanent: true
+        state: enabled
+        immediate: true
+      tags:
+        - security
+
+    - name: Start Security Service if something changed
+      ansible.builtin.service:
+        name: firewalld
+        state: restarted
+      tags:
+        - security
+        - test
+        
+    - name: Task 1 Outside Block
+      ansible.builtin.debug:
+        msg: "App in Place"
+      tags:
+        - all
+
+    - name: Attack, destroy everything
+      ansible.builtin.debug:
+        msg: "Never RUn this"
+      tags:
+        - never
+
+    - name: Task 2 Outside Block
+      ansible.builtin.debug:
+        msg: "SOmething here"
+      tags: always
+
+    - name: Task 3 Outside Block
+      ansible.builtin.debug:
+        msg: "SOmething here"

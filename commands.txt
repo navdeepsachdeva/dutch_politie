@@ -1,0 +1,8 @@
+ ansible-inventory -i myinventory/ --list --yaml
+ansible-navigator inventory -i myinventory/ --list --yaml
+
+ ansible-galaxy role init web_server --init-path="/home/student/politie/roles/"
+
+
+ansible-playbook first.yml  -i politie_inventory --check --become --become-user=root --become-method=sudo --ask-become-pass
+## careful - in command line _ in ansible.cfg

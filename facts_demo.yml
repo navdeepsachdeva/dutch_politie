@@ -1,0 +1,20 @@
+- name: Variable Demo
+  hosts:
+    - dev
+    - utrecht
+    - Load_balancer
+  gather_facts: true
+  vars:
+    floor: Level12
+  # Level13 vars prompt
+  vars_prompt:
+    - name: floor
+      prompt: "Try your LUCK !!"
+      private: false
+  vars_files:
+    - vars/outside_vars.yml
+
+  tasks:
+    - name: Set a FACT
+      ansible.builtin.debug:
+        msg: "{{ inventory_hostname }}  == {{ ansible_fqdn }}  == {{ansible_hostname}}"

@@ -1,0 +1,6 @@
+---
+# defaults file for web_server
+
+web_server_package: httpd
+web_server_state: present
+web_server_content: "File Deployed Level2"

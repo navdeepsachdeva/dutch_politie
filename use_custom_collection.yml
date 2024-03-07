@@ -1,0 +1,9 @@
+- name: Run this using custom Collection
+  hosts: serverb*
+
+  #collections:
+  #  - politie.utrecht
+  roles:
+    - role: politie.utrecht.web_server
+      become: true
+      

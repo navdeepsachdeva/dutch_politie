@@ -1,0 +1,133 @@
+- name: Loops and Dict
+  hosts: servera*
+  gather_facts: false
+  vars_files:
+    - vars/outside_vars.yml
+  tasks:
+## Loops started from 2.5      
+    - name: Print Simple List with_items
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_items: "{{ simple_list }}"
+
+    - name: Print Simple List with_list
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_list: "{{ simple_list }}"
+
+    - name: Print Simple List as loop
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ simple_list }}"
+    - name: Print DICT as with_dict
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_dict: "{{ mydict }}"
+
+    - name: Print DICT as loop
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ mydict | dict2items}}"
+
+    - name: Print sequence with_sequence
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_sequence: start=0 end=5 format=eth%x
+
+    - name: content Folder
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_fileglob:
+        - /etc/ssh/*
+
+    - name: Print Simple List lookup
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ lookup('ansible.builtin.list', simple_list) }}"
+
+    - name: Print DICT lookup
+      ansible.builtin.debug:
+        msg: "{{ item.key }} // {{ item.value }}"
+      loop: "{{ lookup('ansible.builtin.dict', mydict) }}"
+
+    - name: check lookup/query sequence
+      ansible.builtin.debug:
+        msg: "{{ query('ansible.builtin.sequence', 'start=1 end=6 format=eth%x') }}"
+        #msg: "{{ lookup('ansible.builtin.sequence', 'start=1 end=6 format=eth%x') }}"
+    - name: Print lookup sequence
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ query('ansible.builtin.sequence', 'start=1 end=6 format=eth%x') }}"
+
+    - name: Read and Print File
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      #with_file:
+      #  - /etc/passwd
+      loop: "{{ query('ansible.builtin.file', '/etc/passwdddd',errors='warn') }}"
+
+
+
+    - name: Read and Print ENV with_env
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_env:
+        - SHELL
+        - HOME
+        - USER
+    - name: Read and Print File lookup
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ query('ansible.builtin.env', 'HOME','SHELL','USER') }}"
+
+
+    - name: flatten filter
+      ansible.builtin.debug:
+        msg: "{{ ( [1,2,3,[5,6]], ['a','b','c'], [[5,6,1,3], [34,'a','b','c']] ) | flatten | unique}}"
+        
+    - name: flatten lookup plugin
+      ansible.builtin.debug:
+        msg: "{{ lookup('flattened', [1,2,3,[5,6]], ['a','b','c'], [[5,6,1,3], [34,'a','b','c']]) | unique }}"
+        
+    - name: Check both are equal
+      ansible.builtin.assert:
+        that: "{{ ( [1,2,3,[5,6]], ['a','b','c'], [[5,6,1,3], [34,'a','b','c']] ) | flatten | unique}} is eq({{ lookup('flattened', [1,2,3,[5,6]], ['a','b','c'], [[5,6,1,3], [34,'a','b','c']]) | unique }})"
+        success_msg: "Hiurray passed"
+        fail_msg: "Check Again please"
+
+    - name: flatten filter 1
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ ( [1,2,3,[5,6]], ['a','b','c'], [[5,6,1,3], [34,'a','b','c']] ) | flatten | unique}}"
+    - name: flatten filter 2
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_flattened: "{{ ( [1,2,3,[5,6]], ['a','b','c'], [[5,6,1,3], [34,'a','b','c']] ) | unique}}"
+    - name: flatten filter 3
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ lookup('flattened', ( [1,2,3,[5,6]], ['a','b','c'], [[5,6,1,3], [34,'a','b','c']] ))}}"
+     
+    - name: Nested List 1
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      with_subelements:
+        - "{{ users }}"
+        - mysql.hosts
+        #- authorized
+      # loop: "{{ users | subelements('mysql.hosts') }}"
+      #with_list: "{{ users }}"
+    - name: Nested List 2
+      ansible.builtin.debug:
+        msg: "{{ item[0]['password'] }} // {{ item[1] }}"
+        #msg: "{{ item }}"
+      loop: "{{ query('subelements',users,'mysql.hosts') }}"
+
+    - name: Lookup Password Plugin
+      ansible.builtin.user:
+        name: "{{ item.fn }}"
+        comment: "{{ item.fn | upper}} {{ item.ln | upper }}"
+        password: "{{ lookup('password','/home/student/politie/users/{{ item.fn }}.txt chars=ascii_letters,digits encrypt=sha512_crypt length=10') }}"
+        # password: "{{ 'redhat11' | password_hash('sha512') }}"
+      become: true
+      loop: "{{ lookup('ansible.builtin.list', complex_list) }}"

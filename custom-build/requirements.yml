@@ -1,0 +1,6 @@
+collections:
+  - name: /build/politie-utrecht-1.0.0.tar.gz
+    type: file
+  - name: community.general
+  - name: ansible.posix
+  - name: community.postgresql

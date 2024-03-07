@@ -8,15 +8,42 @@ simple_list:
 
 complex_list:
   - fn: edwin
-    ln: H
+    ln: h
   - fn: rene
-    ln: B
+    ln: b
   - fn: erik
-    ln: F
+    ln: f
   - fn: cuno
-    ln: G
+    ln: g
 mydict:
   edwin: H
   rene: B
   erik: F
   cuno: G
+ 
+users:
+  - name: paul
+    password: "paul_pass"
+    authorized:
+    - keys/paul_key1.pub
+    - keys/paul_key2.pub
+    mysql:
+      hosts:
+      - "%"
+      - "127.0.0.1"
+      - "::1"
+      - "localhost"
+    groups:
+    - wheel
+  - name: john
+    password: "john_pass"
+    authorized:
+    - keys/john_key.pub
+    mysql:
+      password: other-mysql-password
+      hosts:
+      - "utility"
+      - "workstation"
+    groups:
+    - wheel
+    - devops

@@ -1,0 +1,8 @@
+- name: Facts Demo
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Print Facts
+      ansible.builtin.debug:
+        msg: "{{ inventory_hostname }}  == {{ ansible_fqdn }}  == {{ansible_hostname}}"

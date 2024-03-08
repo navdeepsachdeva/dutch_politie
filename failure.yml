@@ -1,0 +1,7 @@
+- name: Failure Template
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Failure Printing
+      ansible.builtin.debug:
+        msg: "Just a Message for Failure"

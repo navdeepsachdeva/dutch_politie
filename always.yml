@@ -1,0 +1,7 @@
+- name: Always Template
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Always Printing
+      ansible.builtin.debug:
+        msg: "Just a Message for Always"

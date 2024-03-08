@@ -1,0 +1,106 @@
+Welcome to RedHat Training
+
+DO467: Managing Enterprise Automation with Red Hat Ansible Automation Platform
+Red Hat Ansible Automation Platform 2.2
+
+RH294 (Ansible Playbook) RHCE -> DO374/DO447 (AAP and advance Ansible)  -> DO467 (Enterprise Level via Controller[Tower])
+
+
+ansible-playbook
+ansible-navigator
+
+
+
+
+Chapter 1:
+
+	## The Red Hat Ansible Automation Platform Architecture ##
+
+Red Hat AAP Components:
+
+Ansible Core:
+	CLI:
+		Command line tools like ansible, ansible-playbook, ansible-doc, ansible-inventory, ansible-config
+	Language:
+		YAML to write playbooks, inventory
+	Framework:
+		Ansible collections from Galaxy, Automation hub(execution environments/container Image and Collections) or custom
+	Functions:
+		conditionals, blocks, includes, loops
+
+Ansible Content Collections:
+	Ansible-core package: ansible.builtin collection included
+	Ansible Content Collections: Used from outside and supported by appropriate team with different version
+	
+
+Automation Content Navigator:
+	ansible-navigator with sub commands replaces ansible-playbook, ansible-doc, ansible-inventory, ansible-config
+
+Automation Execution Environments:
+	Container Image which contains Ansible Core, Collections, Python libraries, executables, or other dependencies
+	needed to run your playbook
+	Container Image can be downloaded from registry.redhat.io/private hub. You can also create your own custom 
+	image with ansible-builder
+
+Automation Controller:
+	Previously known as Ansible Tower to maintain operation on scale at enterprise Level
+
+Automation Hub and Private Automation Hub:
+	Place to download Automation Execution Environments and Collections
+
+Red Hat Insights for Red Hat Ansible Automation Platform:
+	Red Hat Insights for Red Hat Ansible Automation Platform and automation analytics can help you understand 
+	what automation code you are running and whether it is successful. 
+	Red Hat Insights can help you identify issues with your managed hosts and generate Ansible Playbooks 
+	to remediate those issues.
+
+
+
+	## Installing Automation Controller and Private Automation Hub  ##
+
+1. Automation Controller and supporting postgresql Database on same node
+2. Standalone Private Automation Hub with a Database on the Same Node
+3. Automation Controller and Private Automation Hub with External Database Servers
+
+1 GB for 10 forks(hosts)
+
+
+Certificate requirements depend on needs:
+
+1. Certificate for corporate or enterprise 
+	custom_ca_cert=/etc/pki/tls/certs/third-party-ca.pem
+2. Automation Controller Certificates:
+	web_server_ssl_cert=/etc/pki/tls/certs/controller.lab.example.com.crt
+	web_server_ssl_key=/etc/pki/tls/private/controller.lab.example.com.key
+3. Automation Hub Certificates:
+	automationhub_ssl_validate_certs = True
+	automationhub_ssl_cert=/etc/pki/tls/certs/hub.lab.example.com.crt
+	automationhub_ssl_key=/etc/pki/tls/private/hub.lab.example.com.key
+
+4. External Postgres Database Certificates:
+	postgres_use_ssl=True
+	postgres_ssl_cer=/etc/pki/tls/certs/hub.lab.example.com.crt
+	postgres_ssl_key=/etc/pki/tls/private/hub.lab.example.com.key
+
+
+
+	##  Initial Configuration of Automation Controller and Private Automation Hub  ##
+
+	#   IMAGES #
+		2 ways images can be put on Automation Hub
+	1. AUtomatic Sync: Add Remote Registries(registry.redhat.io) and sync required image on local HUB(hub.lab.example.com)
+	2. Manual: Create/Download image on localhost and push to Automation Hub using skopeo
+
+
+	#   ANSIBLE COLLECTIONS  #
+		
+	
+	
+
+awx --conf.host https://controller.lab.example.com --conf.username admin --conf.password redhat --conf.insecure inventory list -f human
+awx --conf.host https://controller.lab.example.com --conf.username admin --conf.password redhat --conf.insecure inventory delete 7
+
+awx --conf.host https://controller.lab.example.com --conf.username admin --conf.password redhat --conf.insecure import -o json < asset_user_sylvia.json
+awx team create --name "Developers" --organization "Default" --description "Dev Team" --conf.host https://controller.lab.example.com --conf.username admin --conf.password redhat --conf.insecure
+
+awx   --conf.host https://controller.lab.example.com --conf.username admin --conf.password redhat --conf.insecure  grant --user 'david' --target-team 'Developers' --type 'member'

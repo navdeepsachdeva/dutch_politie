@@ -1,0 +1,21 @@
+inventory:
+- description: ''
+  #host_filter: ansible_facts__ansible_distribution="RedHat"
+  host_filter: ansible_facts__ansible_distribution="RedHat" and ansible_facts__ansible_hostname="servere"
+  kind: smart
+  name: very_smart
+  natural_key:
+    name: very_smart
+    organization:
+      name: Default
+      type: organization
+    type: inventory
+  organization:
+    name: Default
+    type: organization
+  related:
+    groups: []
+    hosts: []
+    labels: []
+  variables: '---'
+

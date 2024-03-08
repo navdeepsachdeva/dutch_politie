@@ -1,0 +1,617 @@
+
+Welcome to DO374
+
+Red Hat Ansible Automation Platform 2.0 DO374
+Developing Advanced Automation with Red Hat Ansible Automation Platform(AAP)
+
+
+vi/vim cp mv rm mkdir ssh firewall-cmd 
+
+
+Chapter 1: Developing Playbooks with Ansible Automation Platform 2
+
+
+Red Hat AAP2 Components:
+
+1. Ansible Core:
+	yum install ansible-core -y
+   ansible.builtin  Modules: provide bare minumum modules, plugins and key functions such as loops, conditionals
+
+	Ealier version upto 2.9, All modules were provided by RedHat. version of Modules was also problem. 
+	cisco device: IOS 1.1    IOS 1.12  IOS 2.2  
+
+	ALL Ansible Modules	=	Ansible Core (RedHat) + Other Specific Modules (Vendor Cisco,MYsql, MS, VMWare, Juniper) 
+
+2. Ansible Content Collections:
+
+Ansible Content Collections made up of related modules, roles, and plug-ins for specific product with specific version (Device, OS etc )that are supported by the same group of developers. It provide flexibility to select different versions of collections for different version of Product( OS/Device)
+
+3. Automation Content Navigator ( ansible-navigator )
+   This tool replaces and extends the functionality of several older command-line utilities
+   yum install ansible-navigator -y 
+  ansible-config		ansible-navigator config
+  ansible-inventory		ansible-navigator inventory
+  ansible-playbook		ansible-navigator run
+  ansible-doc			ansible-navigator doc 
+  ansible-lint			ansible-navigator lint
+
+  It separates the control node on which you run Ansible from the automation execution environment that runs it, by running your playbooks in a container. 
+  watch podman ps 
+
+4. Automation Execution Environments
+   An automation execution environment is a container image that contains Ansible Core, Ansible Content Collections, and any Python libraries, executables, or other dependencies needed to run your playbook
+  Container images can be downloaded from RedHat or custom build( ansible-builder)
+  Playbooks can be run on Automation Controller (formerly called Red Hat Ansible Tower) using Container Image
+  ansible-builder to create your own custom execution environments
+
+5. Automation Controller (Red Hat Ansible Tower or AWX community)
+   Used to run ansible playbook on Enterprise scale. It provides a web UI and a REST API that can be used to configure, run, and evaluate your automation jobs.
+   The new automation controller design separate the control node (providing the web UI and API) from the automation execution environments (now running
+in containers).
+   
+6. Ansible Automation Hub
+   Place to distribute Ansible Collections and Container image registry for automation execution environments.
+   Ansible AUtomation Hub is provided by Redhat/Ansible Galaxy or can be Private Automation Hub within Organization
+
+7. Hosted Services
+
+   Red Hat Insights:  Keep checking Remote Systems to Understand automation code you are running and whether it is successful
+   Automation Services Catalog: Allow nontechnical users to trigger automation with a point-and-click tool based on ITSM standards
+
+
+
+
+Running Playbooks with Automation Content Navigator:
+
+Old Way:
+	This runs playbook on control node
+	ansible-playbook -i inventory playbook.yml
+New Way:
+	This runs playbook on Container using Image (ansible runner)
+	Interactive:
+	ansible-navigator run playbook.yml -i inventory 
+	## Go to specfic section by pressing :NUMBER
+		
+	Non Interactive:
+	ansible-navigator run playbook.yml -i inventory -m stdout
+
+
+Improving Portability with Automation Execution Environments: 
+  Instead of creating multiple Virtual environment to run playbooks for different version of ansible collections, python modules, developers can create the customized environment in a custom execution environment, test it with ansible-
+navigator, and distribute it to the automation controller as a container image.
+  Red Hat Ansible Automation Platform 2.0, this default environment includes Ansible Core 2.11 and a standard set of Red Hat Ansible Certified Content Collections.
+  Image can be download from Redhat/Private AUtomation Hub and used by providing --execution-environment-image (--eei) option to select a specific container image
+  Pull Image:
+   podman login registry.redhat.io(or Private AUtomation Hub)
+   podman pull REGISTRY/IMAGE:TAG
+
+
+ansible-navigator runs the playbook inside a container that cannot see your ~/.ssh directory. ssh-agent is required to add keys using eval $(ssh-agent) which provide ssh keys in container Environment.
+
+Reviewing Previous Playbook Runs:
+Enable ansible playbook artifacts and which generates artifcat file.
+"ansible-navigator replay" command can be used to replay playbook run and shares with other developers
+
+
+	vim ~/.vimrc
+	autocmd FileType yaml setlocal ai ts=2 sw=2 et cuc
+
+Shell/Command/raw modules are NOT Idempotent, Overwrite even if things exist "Desired state"
+
+Idempotent modules will check "Desired State", it already exists doesn't make any change
+
+
+
+				###############  Instructions to Run Playbook ###############
+
+
+###############  Step 1:  Check Syntax of Playbook ###############
+
+New Way:
+ansible-navigator run install_httpd.yml --syntax-check -m stdout ( Non Interactive )
+
+Old Way:
+ansible-playbook install_httpd.yml --syntax-check
+
+
+###############  Step 2:  Run Playbook in Simulation Mode (DRY RUN/ Simulation /Matrix Movie Oracle Prediction) ###############
+###############  Step 2:  This Step only check in playbook if tasks will make any changes in managed hosts or not if run in read mode ###############
+
+
+ansible-navigator run install_httpd.yml --check -m stdout
+ansible-playbook install_httpd.yml --check
+
+				#### OR ####
+
+ansible-navigator run install_httpd.yml -C -m stdout
+ansible-playbook install_httpd.yml -C
+
+
+###############  Step 3:  Run Playbook in Real Mode ###############
+
+
+ansible-navigator run install_httpd.yml -m stdout
+ansible-playbook install_httpd.yml 
+
+
+
+Use Existing Modules:
+
+Use modules which are defied for specific purposes. DO NOT use command, shell, raw as these modules are NOT IDEMPOTENT. These modules doesn't check the current state.
+
+
+Keep your roles in the roles subdirectory of your project, and your collections in the collections subdirectory of your project.
+
+
+
+
+
+########################################################################
+
+	Chapter 2: Managing Content Collections and Execution Environments
+
+
+Ansible Content Collections is a format for distributing modules, plugins, roles than can be downloaded on control node or creating container image to run playbooks
+
+Till Ansible 2.9
+
+yum install ansible -y
+all modules (old play 2.7, new play 2.9)
+
+cisco juniper windows2016 basic linux modules
+
+collections
+ansible.builtin -> basic linux modules
+ansible.satellite -> rh satellite
+cisco.ios  -> IOS device modules
+
+yum install ansible-core -y
+ansible.builtin -> basic linux modules
+All other modules are separtely installed including different version
+
+
+
+
+
+
+
+Collections can be downloaded from Ansible Galaxy, Redhat Content collections or provided by the vendor who provides devices/OS
+
+	## Collections Naming Convention: ##
+Namespce.collection
+
+	## View Collections in Container Image ##
+ansible-navigator collections
+
+	## View Ansible Docs ##
+
+ansible-navigator doc redhat.insights.insights_register 
+ 	OR
+ansible-navigator doc redhat.insights.insights_register -m stdout
+
+
+	## Using Ansible Content Collections in Playbooks ##
+
+namespace.collection.module_name
+redhat.insights.insights_register:
+
+https://github.com/ansible/ansible/blob/devel/lib/ansible/config/ansible_builtin_runtime.yml
+
+
+
+	## Finding and Installing Ansible Content Collections ##
+Ansible automation hub:
+	Ansible automation hub hosts Red Hat Certified Ansible Content Collections. These collections are officially supported by Red Hat and its partners for customers.  e.g. redhat.rhv, redhat.satellite, redhat.insights, and cisco.ios
+
+Ansible Galaxy: 
+	Not Supported, Public and free for everyone
+	community.crypto, community.postgresql
+	
+	## Download from Ansible Galaxy ##
+	ansible-galaxy collection install community.postgresql -p PATH
+
+	## Extract from Tar file ##
+	ansible-galaxy collection install http://www.example.com/redhat-insights-1.0.5.tar.gz
+
+	## Download from Private/Public git repository ##
+	ansible-galaxy collection install git@github.com:ansible-collections/community.mysql.git
+
+
+	## Setup collections Path in ansible.cfg ##
+	[defaults]
+	collections_paths=~/.ansible/collections:/usr/share/ansible/collections
+
+	## Download/Instal Multiple Collections ##
+	Create a requirements file in collections folder
+
+vim collections/requirements.yml
+  - name: community.crypto
+  - name: ansible.posix
+    version: 1.2.0
+  - name: /tmp/community-dns-1.2.0.tar.gz
+  - name: http://www.example.com/redhat-insights-1.0.5.tar.gz
+  - name: git@github.com:ansible-collections/community.mysql.git	
+
+ansible-galaxy collection install -r collections/requirements.yml -p ~/collections
+
+ansible-galaxy collection list
+
+	## Very Important ##
+## CONTROL NODE COLLECTIONS
+The ansible-galaxy collection list command lists the Ansible Content Collections installed in collections_paths on your CONTROL NODE 
+
+## CONTAINER IMAGE COLLECTIONS
+ansible-navigator collections command to list the Ansible Content Collections in your current automation execution environment ( CONTAINER IMAGE )
+
+
+Neither command lists the ansible.builtin collection, which is always available.
+
+
+url directive for private automation hub.
+auth_url directive for RedHat automation hub.
+
+
+	## Selecting an Execution Environment ##
+
+An automation execution environment is a container image that includes Ansible Content Collections, their software dependencies, and a minimal Ansible engine that can run your playbooks
+
+An automation execution environment consists of the following:
+	A. Ansible Core (or Ansible).
+	B. Ansible Content Collections to supplement Ansible Core.
+	C. Python and any other dependencies of Ansible Core and the included collections.
+•	D. Ansible Runner to run your playbooks.
+
+
+ansible-navigator images
+or
+podman images
+
+
+	## Chapter 3: Running Playbooks with Automation Controller ##
+
+	## Automation Controller ##
+Red Hat Ansible Automation Platform 2 includes a component called automation controller, which was called Red Hat Ansible Tower
+
+
+Run a Job:
+1. Organization
+2. Inventory
+3. Playbook Folder on Automation Controller (Manual Copy/Git SCM)
+4. Change permission to chown awx:awx /var/lib/awx/projects/playbook_folder
+5. Project maps to your_playbook_folder (Project <-> one_folder) One to one Mapping
+6. Credentials Tower
+7. Job Template
+8. RBAC User 
+
+
+	## Chapter 4: Working with Ansible Configuration Settings ##
+ansible.cfg			INI Format		key=value
+ansible-navigator.yml		YAML Format		key: value
+
+
+ansible-navigator config
+:f   for filter
+
+
+Ansible configuration File:
+
+ansible --version
+
+Default File(Container Image):	/etc/ansible/ansible.cfg		Level 1
+User file(Home Dir):		~/.ansible.cfg				Level 2		// Hidden File
+Project specific:		./ansible.cfg				Level 3		// Current Folder
+Define Env Variable:		ANSIBLE_CONFIG =/tmp/ansible.cfg	Level 4
+
+ansible-navigator config -m stdout dump/list/view
+
+
+## Configuring Automation Content Navigator ##
+
+ansible-navigator settings file can be in JSON or YAML format:
+	1. For settings in JSON format, the extension must be .json.
+	2. For settings in YAML format, the extension must be .yml or .yaml.
+
+User file(Home Dir):            ~/.ansible-navigator.yml            			Level 1         // Hidden File
+Project specific:               ./ansible-navigator.yml                           	Level 2         // Current Folder
+Define Env Variable:            ANSIBLE_NAVIGATOR_CONFIG =/tmp/ansible-navigator.yml   	Level 3		// Any Path
+
+ 
+
+
+
+	##  Chapter 5: Managing Inventories ##
+
+##  Managing Dynamic Inventories  ##
+
+ansible-navigator doc --mode stdout --type inventory --list
+
+1. Executable File such as inventory script
+2. Ansible tries to parse the given file as a configuration file for inventory plug-ins.
+3. Ansible uses the file as a static inventory file.
+
+
+ansible.cfg
+[inventory]
+enable_plugins = host_list, script, auto, yaml, ini, toml,redhat.satellite.foreman
+
+# foreman.yml
+plugin: theforeman.foreman.foreman
+url: https://foreman.example.com
+user: ansibleinventory
+password: changeme
+host_filters: 'organization="Web Engineering"'
+
+ansible-navigator run --inventory ./foreman.yml my_playbook.yml
+
+
+https://github.com/theforeman/foreman_ansible_inventory/blob/master/foreman_ansible_inventory.py
+ansible-navigator inventory --mode stdout -i origin_inventory --list --yaml
+	https://github.com/ansible/ansible/tree/stable-2.9/contrib/inventory
+
+
+
+ansible-navigator inventory purpose is not convert ini to yaml, instead what is final value for some_var at run tim
+
+		Scope of Variables:
+1 <  2  < 3
+
+A.	Host Scope
+
+
+	1.	Role Defaults				use : symbol
+	2.	inventory File group variable		use = symbol		//NEVER
+	3.	inventory/group_vars/all		use : symbol		//When Inventory is Shared
+	4.	inventory/group_vars/groupname		use : symbol		//When Inventory is Shared
+	5.	groups_vars/{{groupname}}		use : symbol		// when Specfic requirement for playbooks
+	
+	
+	6.	inventory File_ server variable		use = symbol		//NEVER
+	7.	inventory/host_vars/hostname		use : symbol
+	8.	host_vars/{{servername}}		use : symbol
+
+B. 	Play Scope
+	9.	vars:								//NOT Recommended
+	
+	10.	vars_prompt:							// Only for Development Environment
+			Look into vars_prompt_demo.yml in extras folder
+	11.	vars_files:							// For Different ENV
+			- file_path
+	12.	Task Scope:							// 
+		vars:
+		  variable_name: "Value"  ## For that Specific Task
+	13.	set_fact:							// Dev ENV
+			
+C.	Global Scope (Command Line Values)
+	14. ansible-playbook abc.yml -e 'var_name=some_value' 			// TEST at RUN
+
+
+
+
+	## Chapter 6: Managing Task Execution ##
+	
+	## Controlling Privilege Escalation ##
+
+1. ansible.cfg
+2. Play Level
+3. Block Level
+4. Task Level
+
+Use Additive Approach NOT subtractive Approach
+
+
+	## Controlling Task Execution ##
+
+1. Pre Tasks Tasks
+2. Pre Tasks Handlers
+3. Dependency Role Tasks (security_server)
+4. Main Role Tasks (web_server)
+5. extra tasks in playbook
+6. Dependency Role Handlers (security_server)
+7. Main Role Handlers (web_server)
+8. extra handlers invoked by tasks in playbook
+9. Post Tasks Tasks
+10. Post Tasks Handlers
+
+
+
+
+
+
+
+
+
+import_role			include_role
+static/pre-processing		Dynamic/Runtime
+Development			Production
+
+Use case for flush_handlers
+
+
+Import (import_tasks, import_role)
+static inclusion of tasks(you know tasks in advance)
+ansible-playbook abc.yml --syntax-check    ## also check syntax of imported Task file
+4  task in external file ## Condition checked on all task one by one although condition is false
+--start-at-task can be used to start execution of playbook at certain point
+Might take more time
+for Development Environment
+
+include (include_tasks, include_role)
+Dynamic inclusion of tasks(you DO NOT know tasks in advance)
+ansible-playbook abc.yml --syntax-check    ## DOES NOT check syntax of included Task file
+4  task in external file ## Condition checked only once, if false, file tasks are not included in execution of playbook
+--start-at-task does n't work as task names are NOT known in advance
+Time efficient
+for Production Environment
+
+import_playbook: playbook can only be imported NOT included
+
+
+	## Forcefully running handlers ##
+
+- name: Running all notified handlers
+  meta: flush_handlers
+
+
+listen: My handlers
+
+	## Controlling the Order of Host Execution AT PLAY LEVEL ##
+	order: inventory/reverse_inventory/sorted/reverse_sorted/shuffle
+
+
+	##  Running Selected Tasks  ##
+	tags tasks
+
+	System Tags: all always never untagged tagged
+	User Named tags: USER_DEFINED
+
+ ##   ansible-playbook  tagged_demo.yml --skip-tags test,prod,always
+ ##   ansible-playbook  tagged_demo.yml tags dev --skip-tags test,prod,always
+ ##   ansible-playbook  tagged_demo.yml --tags dev --skip-tags test,prod,always
+ ##   ansible-playbook  tagged_demo.yml
+ ##   ansible-playbook  tagged_demo.yml --tags never
+ ##   ansible-playbook  tagged_demo.yml --tags never,untagged
+ ##   ansible-playbook  tagged_demo.yml --tags never,untagged --skip-tags always
+ansible-playbook  tagged_demo.yml --list-tags
+ansible-playbook  tagged_demo.yml --list-tasks
+
+
+
+callback_whitelist=cgroup_perf_recap
+[callback_cgroup_perf_recap]
+control_group=myprofile
+
+
+sudo cgcreate -a student:student -t student:student  -g cpuacct,memory,pids:myprofile
+
+cgexec -g cpuacct,memory,pids:myprofile  ansible-playbook deploy_webservers.yml
+
+
+Chapter 8:
+
+
+
+
+	forks						serial
+1.	ansible.cfg					playbook
+	--forks=4
+2.	Manage number of threads/load			control no of systems updating at same time
+	 on control node (save control node)
+3.	task by task					host by host/play by play
+
+
+5 tasks
+forks 4
+Hosts: 10
+	Horizontal Direction
+	A	B	C	D		E	F	 G 	H 		I 	J
+	1	1	1	1		1	1	1	1		1	1
+	2	2	2	2		2	2	2	2		2	2
+	3	3	3	3		3	3	3	3		3	3
+	4	4	4	4		4	4	4	4		4	4
+	5	5	5	5		5	5	5	5		5	5
+	
+	
+	
+	
+	
+	
+	
+serial: 3
+Vertical Direction:
+	A	B	C		D	E	F 		G 	H 	I	 	J	K	L
+	
+	1	1	1		1	1	1		1	1	1		1	1	1
+	2	2	2		2	2	2		2	2	2		2	2	2
+	3	3	3		3	3	3		3	3	3		3	3	3
+	4	4	4		4	4	4		4	4	4		4	4	4
+	
+	
+
+	##	Chapter 9: ##
+
+## Create and Publish Collection ##
+
+1. Login to hub.lab.example.com with credentials
+2. Create namespace ( e.q. exampleorg)
+3. Create collection skeleton
+	ansible-galaxy collection init exampleorg.test
+4. create or copy roles in exampleorg/test/roles folder
+
+	ansible-galaxy role init web_server
+5. Declare dependencies roles in galaxy.yml
+	dependencies:
+		community.general: '>=1.0.0'
+		ansible.posix: '>=1.0.0'
+6. mkdir meta folder in exampleorg/test/ to defined minumum ansible version
+	vim exampleorg/test/meta/runtime.yml:
+	---
+	requires_ansible: '>=2.9.10'
+7. copy custom modules in collection:
+	mkdir exampleorg/test/plugins/modules
+	cp PATH/*.py exampleorg/test/plugins/modules
+8. Build Collection
+	ansible-galaxy collection build
+9. Update ansible.cfg to download collection
+	[galaxy]
+	server_list = hub_exampleorg
+	[galaxy_server.hub_exampleorg]
+	url = https://hub.lab.example.com/api/galaxy/content/inbound-exampleorg
+	token =
+10. Publish Collection
+	ansible-galaxy collection publish -v PATH_OF_TAR_FILE
+11. Update ansible.cfg for Publish PATH
+        [galaxy]     
+        server_list = hub_exampleorg
+        [galaxy_server.hub_exampleorg]
+	url=https://hub.lab.example.com/api/galaxy/content/published/
+	token=c4f21af7090f0f9cb74d3c3f9e1748884ecdc180
+12. Update ansible.cfg for Galaxy to download dependencies
+	[galaxy_server.galaxy]
+	url=https://galaxy.ansible.com/
+13. Approve Collections on hub.lab.example.com
+
+14. Create Playbook
+	collections:
+	  - exampleorg.test
+	roles:
+	  - role: exampleorg.test.web_server
+
+
+
+## Building a Custom Execution Environment ##
+
+1. yum install ansible-builder
+2. mkdir mybuild; cd mybuild
+3. vim execution-environment.yml
+---
+version: 1
+build_arg_defaults:
+  EE_BASE_IMAGE: 'hub.lab.example.com/ee-minimal-rhel8:latest'
+  EE_BUILDER_IMAGE: 'hub.lab.example.com/ansible-builder-rhel8:latest'
+dependencies:
+  galaxy: requirements.yml
+  python: requirements.txt
+  system: bindep.txt
+
+4. Define all collections required
+   vim requirements.yml
+   collections:
+     - name: /build/exercise.motd.tar.gz
+       type: file   
+
+5.  Define all Python packages require
+ 	vim requirements.txt
+	funmotd
+6. vim bindep.txt
+   hostname
+
+7. ansible-builder create
+8. Copy TAR file context/_build/
+9. ansible-builder build  -t ee-custom-minimal:1.0
+10. podman images
+    podman tag localhost/ee-custom-minimal:1.0 hub.lab.example.com/ee-custom-minimal:1.0
+    podman push hub.lab.example.com/ee-custom-minimal:1.0
+
+
+
+

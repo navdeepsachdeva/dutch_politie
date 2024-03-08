@@ -15,3 +15,11 @@
   notify:        
     - Start Web Service if something changed
     - Application Deployed
+
+- name: Deploy a Infra HTML Page
+  ansible.builtin.template:
+    src: html_template.j2
+    dest: /var/www/html/info.html
+  notify:        
+    - Start Web Service if something changed
+    - infomation collected

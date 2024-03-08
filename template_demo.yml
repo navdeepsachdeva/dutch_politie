@@ -1,0 +1,26 @@
+- name: Template Demo
+  hosts: servera*
+  gather_facts: true
+  become: true
+  tasks:
+    - name: Install Web Package
+      ansible.builtin.dnf:
+        name: httpd
+        state: present
+
+    - name: Deploy a Web App
+      ansible.builtin.template:
+        src: j2/simple_template.j2
+        dest: /var/www/html/index.html
+
+    - name: Open Security Port
+      ansible.posix.firewalld:
+        service: http
+        permanent: true
+        state: enabled
+        immediate: true
+
+    - name: Start Web Service if something changed
+      ansible.builtin.service:
+        name: httpd
+        state: restarted

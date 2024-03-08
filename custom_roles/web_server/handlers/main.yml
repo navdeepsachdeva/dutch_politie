@@ -42,3 +42,7 @@
   ansible.builtin.debug:
     msg: "App5 in Place"
   listen: Application Deployed
+
+- name: infomation collected
+  ansible.builtin.debug:
+    msg: "Information About System collected"

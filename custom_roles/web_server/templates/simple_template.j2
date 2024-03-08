@@ -1,0 +1,9 @@
+Operating System    = {{ ansible_distribution }}
+Hostname            = {{ ansible_facts['hostname'] }}
+FQDN                = {{ ansible_facts['fqdn'] }}
+Time                = {{ ansible_date_time.time }}
+Architecture        = {{ ansible_architecture }}
+IP Address          = {{ ansible_facts['default_ipv4']['address']}}
+VDA Size            = {{ ansible_devices.vda.size | default("Not Available")}}
+VDD Size            = {{ ansible_devices.vdd.size | default("Not Available") }}
+Free Memory         = {{ ansible_memory_mb.real.free }}

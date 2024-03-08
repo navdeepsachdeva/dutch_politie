@@ -1,0 +1,18 @@
+<html>
+<head>
+  <title> Architecture Information </title>
+</head
+<body>
+	<h1>
+    Operating System    = {{ ansible_distribution }}<br/>
+    Hostname            = {{ ansible_facts['hostname'] }}<br/>
+    FQDN                = {{ ansible_facts['fqdn'] }}<br/>
+    Time                = {{ ansible_date_time.time }}<br/>
+    Architecture        = {{ ansible_architecture }}<br/>
+    IP Address          = {{ ansible_facts['default_ipv4']['address']}}<br/>
+    VDA Size            = {{ ansible_devices.vda.size | default("Not Available")}}<br/>
+    VDD Size            = {{ ansible_devices.vdd.size | default("Not Available") }}<br/>
+    Free Memory         = {{ ansible_memory_mb.real.free }}<br/>
+	</h1>
+</body>
+</html

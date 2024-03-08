@@ -1,0 +1,31 @@
+- name: Debug Strategy Demo
+  hosts: servera*
+  gather_facts: false
+  become: true
+  strategy: debug
+  tasks:
+    - name: Task 1
+      ansible.builtin.command: sleep 1
+      register: captured
+
+    - name: Install Web Package Task 21
+      ansible.builtin.dnf:
+        name: httpddddd
+        state: present
+
+    - name: Deploy a Web App Task 22
+      ansible.builtin.copy:
+        content: "File {{ captured.changed }}"
+        dest: /var/wwwWW/html/index.html
+
+    - name: Open Security Port Task 31
+      ansible.posix.firewalld:
+        serviceeeeeee: http
+        permanent: trueeeeeeeeee
+        state: enabledddddddd
+        immediateeeeeee: true
+        
+    - name: Start Web Service Task 32
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
